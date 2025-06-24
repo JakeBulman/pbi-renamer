@@ -6,6 +6,8 @@ output_folder = Path(Path(__file__).parent / '../powerbi-files/output-pbi')
 target_folder = Path(Path(__file__).parent / '../powerbi-files/target-pbi')
 test_folder = Path(Path(__file__).parent / '../powerbi-files/test-pbi')
 
+output_folder.mkdir(exist_ok=True)
+target_folder.mkdir(exist_ok=True)
 
 def clear_folder(top_folder: Path) -> None:
     """
