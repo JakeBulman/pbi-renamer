@@ -1,6 +1,6 @@
 import json, os, stat, shutil, re
 from pathlib import Path
-
+from typing import Union
 
 output_folder = Path(Path(__file__).parent / '../powerbi-files/output-pbi')
 target_folder = Path(Path(__file__).parent / '../powerbi-files/target-pbi')
@@ -9,37 +9,32 @@ test_folder = Path(Path(__file__).parent / '../powerbi-files/test-pbi')
 output_folder.mkdir(exist_ok=True)
 target_folder.mkdir(exist_ok=True)
 
-def clear_folder(top_folder: Path) -> None:
+def clear_folder(root: Union[str, Path],*,keep_root: bool = True) -> None:
     """
-    Takes a directory folder and removes all files and permissions from it recursively so that it can be emptied.
+    Recursively clear read-only flags and delete all files/dirs under `root`.
+    If keep_root is False, the root folder itself is also removed.
     """
+    root = Path(root)
 
-    def recursive_ro_strip(current_dir) -> None:
-        dirs = current_dir.glob('*')
-        item_count = len(list(dirs))
-        #Reset glob as it is "consumed" by the counter
-        dirs = current_dir.glob('*')
-        #Check if anything is in the folder
-        if item_count > 0:
-            for dir in dirs:
-                #If item is a folder, strip it's read-only. If it's a file, delete it.
-                if Path(dir).is_dir():
-                    os.chmod(dir.absolute() ,stat.S_IWRITE)
-                    recursive_ro_strip(dir)
-                else:
-                    dir.unlink()
-            #Run through everything 
-            dirs = current_dir.glob('*')
-            for dir in dirs:
-                os.chmod(dir.absolute() ,stat.S_IWRITE)
-                recursive_ro_strip(dir)
+    def _on_rm_error(func, path, exc_info):
+        # Called by shutil.rmtree on failure (e.g. read-only). Clear flag and retry.
+        p = Path(path)
+        p.chmod(stat.S_IWRITE)
+        func(path)
+
+    # Iterate direct children of root
+    for child in root.iterdir():
+        if child.is_dir():
+            # Recursively delete entire subdir, handling read-only via onerror
+            shutil.rmtree(child, onerror=_on_rm_error)
         else:
-            #Once all files and read_only removed from within, delete the folder, unless it's top folder
-            if current_dir.resolve() != top_folder.resolve():
-                shutil.rmtree(current_dir)
+            # File: clear RO flag then unlink
+            child.chmod(stat.S_IWRITE)
+            child.unlink()
 
-    #Begin the recursion
-    recursive_ro_strip(top_folder)
-
-
-clear_folder(output_folder)
+    # Finally, remove the root folder itself if desired
+    if not keep_root:
+        shutil.rmtree(root, onerror=_on_rm_error)
+        
+#Begin the recursion
+clear_folder(output_folder, keep_root=True)

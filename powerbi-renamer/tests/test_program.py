@@ -1,22 +1,38 @@
+import os, stat, pytest
+from pathlib import Path
+
+from src.program import clear_folder
+
 def test_clear_folder():
-    from src.program import clear_folder
-    from pathlib import Path
-
-    # Define a temporary folder for testing
+    # Setup: create a temp folder and populate it
     test_folder = Path('./test-clear-folder')
-    test_folder.mkdir(exist_ok=True)
+    if test_folder.exists():
+        pytest.skip("Please remove existing './test-clear-folder' before running tests")
+    test_folder.mkdir()
 
-    # Create some files and directories in the test folder
-    (test_folder / 'file1.txt').touch()
-    (test_folder / 'file2.txt').touch()
-    (test_folder / 'subdir').mkdir(exist_ok=True)
-    (test_folder / 'subdir' / 'file3.txt').touch()
+    # Normal files
+    (test_folder / 'file1.txt').write_text('hello')
+    (test_folder / 'file2.txt').write_text('world')
 
-    # Call the clear_folder function
+    # Nested subdir with a file
+    subdir = test_folder / 'subdir'
+    subdir.mkdir()
+    (subdir / 'file3.txt').write_text('foo')
+
+    # Read-only subdir + file
+    ro_subdir = test_folder / 'readonly_subdir'
+    ro_subdir.mkdir()
+    ro_file = ro_subdir / 'secret.txt'
+    ro_file.write_text('top secret')
+    # Make both the file and the folder read-only
+    os.chmod(ro_file, stat.S_IREAD)
+    os.chmod(ro_subdir, stat.S_IREAD)
+
+    # Exercise
     clear_folder(test_folder)
 
-    # Check if the folder is empty
-    assert not any(test_folder.iterdir()), "The folder should be empty after clearing."
+    # Verify: nothing left inside
+    assert not any(test_folder.iterdir()), "Folder must be empty regardless of read-only flags"
 
-    # Clean up the test folder
-    test_folder.rmdir()  # Remove the test folder itself
+    # Teardown: remove the (now empty) folder
+    test_folder.rmdir()
