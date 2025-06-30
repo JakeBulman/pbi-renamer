@@ -35,6 +35,16 @@ def clear_folder(root: Union[str, Path],*,keep_root: bool = True) -> None:
     # Finally, remove the root folder itself if desired
     if not keep_root:
         shutil.rmtree(root, onerror=_on_rm_error)
+
+def check_target_folder(root: Union[str, Path]) -> str:
+    """
+    Checks if the target folder exists and contains a single .pbip file.
+    """
+    return "abc"
+    #Write code for issue #2 here.
+
+
         
 #Begin the recursion
 clear_folder(output_folder, keep_root=True)
+check_target_folder(target_folder)
