@@ -40,9 +40,14 @@ def test_clear_folder():
 def test_check_target_folder():
     # Setup: create a temp folder and populate it with sample files
     test_sample_folder = Path(Path(__file__).parent / '../powerbi-files/sample-pbi/')
-    if not test_sample_folder.exists():
-        pytest.skip("Please ensure '../python-renamer/powerbi-files/sample-pbi/' exists before running tests")
 
+    # Check that the sample folder exists, as it is required for testing
+    try:
+        assert test_sample_folder.exists()
+    except AssertionError:
+        raise FileNotFoundError(f"Sample folder ../powerbi-files/sample-pbi/ does not exist. Please ensure it is present before running tests.")
+
+    # Create the target folder for testing
     test_target_folder = Path(Path(__file__).parent / '../powerbi-files/test-target-pbi/')
     if test_target_folder.exists():
         test_target_folder.rmdir()  # Remove existing folder if it exists
@@ -79,6 +84,18 @@ def test_check_target_folder():
     assert str(excinfo.value) == f"Too many .pbip files in {test_target_folder}."
 
 
-    # Teardown: remove all test folders
+    ###Excercise 4###
+    # Delete target-pbi folder and check for errors
+    target_folder = Path(Path(__file__).parent / '../powerbi-files/target-pbi/')
+    target_folder.rmdir()
+    # Exercise4: check if an error is raised when the target folder doesn'ty exist. 
+    with pytest.raises(RuntimeError) as excinfo:
+        check_target_folder(test_target_folder)  
+    # Verify3: check that the exception message is correct
+    assert str(excinfo.value) == f"Too many .pbip files in {test_target_folder}."  
+
+
+    # Teardown: remove all test folders, create removed folders if they don't exist
     test_target_folder.rmdir()
+    target_folder.mkdir(exist_ok=True)
 
