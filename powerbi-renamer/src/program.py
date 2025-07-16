@@ -43,6 +43,7 @@ def check_target_folder(root: Union[str, Path]) -> str:
     checks for exactly one .pbip file, and ensures its definition folder exists.
     """
     target_folder = Path(root)
+    print(f"Checking target folder: {target_folder}")
     sample_folder = target_folder.parent / "sample-pbi"
 
 
@@ -54,7 +55,7 @@ def check_target_folder(root: Union[str, Path]) -> str:
 
     if not target_folder.is_dir():
         raise FileNotFoundError(
-            f"Target folder '{target_folder}' does not exist. Please ensure it is present."
+            f"The following folder does not exist: {target_folder}."  
         )
 
     pbip_files = list(target_folder.glob("*.pbip"))
@@ -66,7 +67,7 @@ def check_target_folder(root: Union[str, Path]) -> str:
     pbip_file = pbip_files[0]
     report_name = pbip_file.stem
     report_definition_folder = (
-        target_folder.parent / f"{report_name}.Report" / "definition"
+        target_folder / f"{report_name}.Report" / "definition"
     )
 
     if not report_definition_folder.is_dir():

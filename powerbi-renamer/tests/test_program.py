@@ -74,7 +74,7 @@ def test_check_target_folder():
 
     ###Excercise 3###
     # Copy extra sample file to the target folder
-    shutil.copy(Path(test_sample_folder / "Test PBI.pbip") , test_target_folder, dirs_exist_ok=True)
+    shutil.copy(Path(test_sample_folder / "Test PBI.pbip") , test_target_folder / "Test PBI 2.pbip")
 
     # Exercise3: check if the target folder has multiple .pbip files. 
     # This test could be extended to cover multiple folders, but as the process runs off of the .pbip file's name it shouldn't be an issue.
@@ -87,12 +87,12 @@ def test_check_target_folder():
     ###Excercise 4###
     # Delete target-pbi folder and check for errors
     target_folder = Path(Path(__file__).parent / '../powerbi-files/target-pbi/')
-    shutil.rmtree(test_target_folder)
+    clear_folder(test_target_folder)
     # Exercise4: check if an error is raised when the target folder doesn'ty exist. 
-    with pytest.raises(RuntimeError) as excinfo:
+    with pytest.raises(FileNotFoundError) as excinfo:
         check_target_folder(test_target_folder)  
     # Verify3: check that the exception message is correct
-    assert str(excinfo.value) == f"Too many .pbip files in {test_target_folder}."  
+    assert str(excinfo.value) == f"The following folder does not exist: {test_target_folder}."  
 
 
     # Teardown: remove all test folders, create removed folders if they don't exist
