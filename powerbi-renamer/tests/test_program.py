@@ -6,8 +6,16 @@ from src.program import clear_folder, check_target_folder
 def test_clear_folder():
     # Setup: create a temp folder and populate it
     test_folder = Path('./test-clear-folder')
+
     if test_folder.exists():
-        pytest.skip("Please remove existing './test-clear-folder' before running tests")
+        clear_folder(test_folder, keep_root=False)  # Clear it if it exists
+    
+    # Exercise1: check if an error is raised when the target folder doesn'ty exist. 
+    with pytest.raises(FileNotFoundError) as excinfo:
+        clear_folder(test_folder)  
+    # Verify1: check that the exception message is correct
+    assert str(excinfo.value) == f"The following folder does not exist: {test_folder}."    
+
     test_folder.mkdir()
 
     # Normal files
@@ -28,10 +36,10 @@ def test_clear_folder():
     os.chmod(ro_file, stat.S_IREAD)
     os.chmod(ro_subdir, stat.S_IREAD)
 
-    # Exercise
+    # Exercise2
     clear_folder(test_folder)
 
-    # Verify: nothing left inside
+    # Verify2: nothing left inside
     assert not any(test_folder.iterdir()), "Folder must be empty regardless of read-only flags"
 
     # Teardown: remove the (now empty) folder
@@ -91,5 +99,5 @@ def test_check_target_folder():
     # Exercise4: check if an error is raised when the target folder doesn'ty exist. 
     with pytest.raises(FileNotFoundError) as excinfo:
         check_target_folder(test_target_folder)  
-    # Verify3: check that the exception message is correct
+    # Verify4: check that the exception message is correct
     assert str(excinfo.value) == f"The following folder does not exist: {test_target_folder}."
