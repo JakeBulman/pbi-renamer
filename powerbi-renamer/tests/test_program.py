@@ -87,15 +87,9 @@ def test_check_target_folder():
     ###Excercise 4###
     # Delete target-pbi folder and check for errors
     target_folder = Path(Path(__file__).parent / '../powerbi-files/target-pbi/')
-    clear_folder(test_target_folder)
+    clear_folder(test_target_folder, keep_root=False)
     # Exercise4: check if an error is raised when the target folder doesn'ty exist. 
     with pytest.raises(FileNotFoundError) as excinfo:
         check_target_folder(test_target_folder)  
     # Verify3: check that the exception message is correct
-    assert str(excinfo.value) == f"The following folder does not exist: {test_target_folder}."  
-
-
-    # Teardown: remove all test folders, create removed folders if they don't exist
-    test_target_folder.rmdir()
-    target_folder.mkdir(exist_ok=True)
-
+    assert str(excinfo.value) == f"The following folder does not exist: {test_target_folder}."
