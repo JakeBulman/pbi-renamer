@@ -10,7 +10,7 @@ def test_clear_folder():
     if test_folder.exists():
         clear_folder(test_folder, keep_root=False)  # Clear it if it exists
     
-    # Exercise1: check if an error is raised when the target folder doesn'ty exist. 
+    # Exercise1: check if an error is raised when the target folder doesn't exist. 
     with pytest.raises(FileNotFoundError) as excinfo:
         clear_folder(test_folder)  
     # Verify1: check that the exception message is correct
