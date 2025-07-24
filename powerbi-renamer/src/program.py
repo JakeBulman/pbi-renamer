@@ -21,6 +21,8 @@ def clear_folder(root: Union[str, Path], *, keep_root: bool = True) -> None:
     If keep_root is False, the root folder itself is also removed.
     """
     root = Path(root)
+    if not root.is_dir():
+        raise FileNotFoundError(f"The following folder does not exist: {root}.")
 
     def _on_rm_error(func, path, exc_info):
         p = Path(path)

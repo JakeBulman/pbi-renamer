@@ -6,8 +6,16 @@ from src.program import clear_folder, check_target_folder
 def test_clear_folder():
     # Setup: create a temp folder and populate it
     test_folder = Path('./test-clear-folder')
+
     if test_folder.exists():
-        pytest.skip("Please remove existing './test-clear-folder' before running tests")
+        clear_folder(test_folder, keep_root=False)  # Clear it if it exists
+    
+    # Exercise1: check if an error is raised when the target folder doesn't exist. 
+    with pytest.raises(FileNotFoundError) as excinfo:
+        clear_folder(test_folder)  
+    # Verify1: check that the exception message is correct
+    assert str(excinfo.value) == f"The following folder does not exist: {test_folder}."    
+
     test_folder.mkdir()
 
     # Normal files
@@ -28,10 +36,10 @@ def test_clear_folder():
     os.chmod(ro_file, stat.S_IREAD)
     os.chmod(ro_subdir, stat.S_IREAD)
 
-    # Exercise
+    # Exercise2
     clear_folder(test_folder)
 
-    # Verify: nothing left inside
+    # Verify2: nothing left inside
     assert not any(test_folder.iterdir()), "Folder must be empty regardless of read-only flags"
 
     # Teardown: remove the (now empty) folder
@@ -39,16 +47,15 @@ def test_clear_folder():
 
 def test_check_target_folder():
     # Setup: create a temp folder and populate it with sample files
+    # Reference the sample folder for testing
     test_sample_folder = Path(Path(__file__).parent / '../powerbi-files/sample-pbi/')
-
-    # Check that the sample folder exists, as it is required for testing
     try:
         assert test_sample_folder.exists()
     except AssertionError:
         raise FileNotFoundError(f"Sample folder ../powerbi-files/sample-pbi/ does not exist. Please ensure it is present before running tests.")
 
     # Create the target folder for testing
-    test_target_folder = Path(Path(__file__).parent / '../powerbi-files/target-pbi/')
+    test_target_folder = Path(Path(__file__).parent / '../powerbi-files/test-target-pbi/')
     if test_target_folder.exists():
         shutil.rmtree(test_target_folder)  # Remove existing folder if it exists
     test_target_folder.mkdir()
@@ -85,11 +92,11 @@ def test_check_target_folder():
 
 
     ###Excercise 4###
-    # Delete target-pbi folder and check for errors
-    target_folder = Path(Path(__file__).parent / '../powerbi-files/target-pbi/')
+    # Delete test-target-pbi folder and check for errors
     clear_folder(test_target_folder, keep_root=False)
+    
     # Exercise4: check if an error is raised when the target folder doesn'ty exist. 
     with pytest.raises(FileNotFoundError) as excinfo:
         check_target_folder(test_target_folder)  
-    # Verify3: check that the exception message is correct
+    # Verify4: check that the exception message is correct
     assert str(excinfo.value) == f"The following folder does not exist: {test_target_folder}."
