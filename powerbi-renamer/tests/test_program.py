@@ -1,7 +1,8 @@
 import os, stat, pytest, shutil
 from pathlib import Path
 
-from src.program import clear_folder, check_target_folder
+from src.program import clear_folder
+from src.powerbi import PowerBI
 
 def test_clear_folder():
     # Setup: create a temp folder and populate it
