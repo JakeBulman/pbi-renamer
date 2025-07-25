@@ -46,7 +46,7 @@ def test_clear_folder():
     # Teardown: remove the (now empty) folder
     test_folder.rmdir()
 
-def test_check_target_folder():
+def test_load_target_folder():
     # Setup: create a temp folder and populate it with sample files
     # Reference the sample folder for testing
     test_sample_folder = Path(Path(__file__).parent / '../powerbi-files/sample-pbi/')
@@ -61,11 +61,13 @@ def test_check_target_folder():
         shutil.rmtree(test_target_folder)  # Remove existing folder if it exists
     test_target_folder.mkdir()
 
+    #Set up a new powerbi object
+    powerbi = PowerBI(test_sample_folder)
 
     ###Excercise 1###
     # Exercise1: check if the target folder has no .pbip file
     with pytest.raises(FileNotFoundError) as excinfo:
-        check_target_folder(test_target_folder)
+        powerbi.load_target_folder(test_target_folder)
     # Verify1: check that the exception message is correct
     assert str(excinfo.value) == f".pbip file does not exist in {test_target_folder}."
     
@@ -75,7 +77,7 @@ def test_check_target_folder():
     shutil.copytree(test_sample_folder, test_target_folder, dirs_exist_ok=True)
 
     # Exercise2: check if the target folder contains exactly one .pbip file
-    test_report_name = check_target_folder(test_target_folder)
+    test_report_name = powerbi.load_target_folder(test_target_folder)
     # Verify2: check if the target folder exists and contains exactly one .pbip file
     assert test_report_name == "Test PBI.pbip", f"Expected exactly one .pbip file in {test_target_folder}, found {test_report_name}."
 
@@ -87,7 +89,7 @@ def test_check_target_folder():
     # Exercise3: check if the target folder has multiple .pbip files. 
     # This test could be extended to cover multiple folders, but as the process runs off of the .pbip file's name it shouldn't be an issue.
     with pytest.raises(RuntimeError) as excinfo:
-        check_target_folder(test_target_folder)  
+        powerbi.load_target_folder(test_target_folder)  
     # Verify3: check that the exception message is correct
     assert str(excinfo.value) == f"Too many .pbip files in {test_target_folder}."
 
@@ -98,6 +100,6 @@ def test_check_target_folder():
     
     # Exercise4: check if an error is raised when the target folder doesn'ty exist. 
     with pytest.raises(FileNotFoundError) as excinfo:
-        check_target_folder(test_target_folder)  
+        powerbi.load_target_folder(test_target_folder)  
     # Verify4: check that the exception message is correct
     assert str(excinfo.value) == f"The following folder does not exist: {test_target_folder}."

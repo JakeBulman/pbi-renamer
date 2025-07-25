@@ -8,10 +8,10 @@ class PowerBI(object):
     """
 
     def __init__(self, object_folder: Union[str, Path]):
-        self.name = self.check_target_folder(object_folder)
+        self.name = self.load_target_folder(object_folder)
         self.location = object_folder
 
-    def check_target_folder(self, root: Union[str, Path]) -> str:
+    def load_target_folder(self, root: Union[str, Path]) -> str:
         """
         Validates that a sample folder and the given target folder exist,
         checks for exactly one .pbip file, and ensures its definition folder exists.
