@@ -38,4 +38,4 @@ class PowerBI(object):
         if not report_definition_folder.is_dir():
             raise FileNotFoundError(f"Expected report folder '{report_definition_folder}' not found.")
 
-        return pbip_file.name
+        return report_name

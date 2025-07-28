@@ -46,6 +46,23 @@ def test_clear_folder():
     # Teardown: remove the (now empty) folder
     test_folder.rmdir()
 
+def test_powerbi_object():
+    #Setup: check sample-pbi folder exists
+    test_sample_folder = Path(Path(__file__).parent / '../powerbi-files/sample-pbi/')
+    try:
+        assert test_sample_folder.exists()
+    except AssertionError:
+        raise FileNotFoundError(f"Sample folder ../powerbi-files/sample-pbi/ does not exist. Please ensure it is present before running tests.")
+    
+    ###Excercise 1###
+    # Exercise1: Create a PowerBI object with the sample folder
+    powerbi = PowerBI(test_sample_folder)
+    # Verify1: check if the PowerBI object is created correctly
+    assert powerbi.name == "Test PBI"
+    assert powerbi.location == test_sample_folder
+    assert isinstance(powerbi, PowerBI)
+
+
 def test_load_target_folder():
     # Setup: create a temp folder and populate it with sample files
     # Reference the sample folder for testing
@@ -64,6 +81,7 @@ def test_load_target_folder():
     #Set up a new powerbi object
     powerbi = PowerBI(test_sample_folder)
 
+
     ###Excercise 1###
     # Exercise1: check if the target folder has no .pbip file
     with pytest.raises(FileNotFoundError) as excinfo:
@@ -79,7 +97,7 @@ def test_load_target_folder():
     # Exercise2: check if the target folder contains exactly one .pbip file
     test_report_name = powerbi.load_target_folder(test_target_folder)
     # Verify2: check if the target folder exists and contains exactly one .pbip file
-    assert test_report_name == "Test PBI.pbip", f"Expected exactly one .pbip file in {test_target_folder}, found {test_report_name}."
+    assert test_report_name == "Test PBI", f"Expected exactly one .pbip file in {test_target_folder}, found {test_report_name}."
 
 
     ###Excercise 3###
