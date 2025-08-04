@@ -1,3 +1,6 @@
+#Anything in /target-pbi/ folder
+powerbi-renamer/powerbi-files/target-pbi/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]
